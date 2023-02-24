@@ -1,12 +1,18 @@
 const RoomType = require("../models/building")
 
 class buildingService {
-    async getAllHouses() {
-        let allHouses = await RoomType.aggregate([
-            {$match:{floor:{$gte:3}}},
-            {$sort:{floor:1}}
+    async getAllHouses({page = 1, limit = 1000}) {
+        const count = await RoomType.aggregate([
+            { $match: { floor: { $gte: 3 } } }
         ])
-        return allHouses
+        const skip = (Number(page) - 1) * Number(limit)
+        let allHouses = await RoomType.aggregate([
+            { $match: { floor: { $gte: 3 } } },
+            { $sort: { floor: 1 } },
+            { $skip: skip },
+            {$limit:Number(limit)}
+        ])
+        return {count: count.length, allHouses}
     }
 
     async createHouse(body, file) {

@@ -7,7 +7,10 @@ class contactService {
         return allMessage
     }
 
-    async create(contact) {
+    async create(contact, res) {
+        if (!contact.email) {
+            throw new Error("Email required")
+        }
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -37,17 +40,27 @@ class contactService {
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log("error")
-                res.send("error")
-            } else {
-                console.log("Email send:" + info.response)
-                res.send("success")
+                console.log(error, "error ka")
+                throw new Error("Don't recognize the mail")
             }
         })
+
+        //const result = await transporter
+        //    .sendMail(mailOptions)
+        //    .then((res) =>console.log(res))
+        //    .catch((error) => {
+        //        res.send({error})
+        //    })
+        
 
         const sendMessage = await ContactModel({...contact})
         await sendMessage.save()
         return sendMessage
+        
+
+        
+
+        
     }
 }
 

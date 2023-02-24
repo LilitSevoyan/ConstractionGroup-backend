@@ -3,10 +3,11 @@ const buildingService = require("../services/building-service")
 class buildingController {
     async getAllHouses(req, res) {
         try {
-            let allHouses = await buildingService.getAllHouses()
+            let allHouses = await buildingService.getAllHouses(req.query)
             res.json(allHouses)
         }
         catch(err) {
+            console.log(err)
             res.json({errMessage:err})
         }
     }
@@ -111,7 +112,7 @@ class buildingController {
     async getFilterByMinArea(req, res) {
         try {
             const {min} = req.params
-            
+            let minArea = await buildingService.getFilterByMinArea(min)
            res.json(minArea)
         }
         catch(err) {

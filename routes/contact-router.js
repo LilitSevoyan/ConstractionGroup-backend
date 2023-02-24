@@ -1,6 +1,5 @@
 const express = require("express")
 const router = express.Router()
-const ContactModel = require("../models/contact")
 const contactController = require("../controllers/contact-controller")
 
 
