@@ -7,6 +7,15 @@ class buildingController {
             res.json(allHouses)
         }
         catch(err) {
+            res.json({errMessage:err})
+        }
+    }
+
+    async getFilterHouses(req, res) { 
+        try {
+            let filter = await buildingService.getFilterHouses(req.query)
+            res.json(filter)
+        } catch(err) {
             console.log(err)
             res.json({errMessage:err})
         }

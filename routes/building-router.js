@@ -4,6 +4,7 @@ const upload = require("../middlewares/multer-middleware")
 const buildingController = require("../controllers/building-controller")
 
 router.get("/", buildingController.getAllHouses)
+router.get("/filters", buildingController.getFilterHouses)
 router.post("/", upload.single("poster"), buildingController.createHouse)
 router.get('/getPdf/:img', buildingController.getPdf)
 router.get("/floor/:floor", buildingController.getFloorHouses)

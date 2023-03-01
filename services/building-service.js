@@ -10,9 +10,73 @@ class buildingService {
             { $match: { floor: { $gte: 3 } } },
             { $sort: { floor: 1 } },
             { $skip: skip },
-            {$limit:Number(limit)}
+            { $limit: Number(limit) }
         ])
         return {count: count.length, allHouses}
+    }
+
+    async getFilterHouses({page = 1, limit = 1000, badge, floor, room, price_min, price_max, area_min, area_max, sort}) {
+        
+        const skip = (Number(page) - 1) * Number(limit)
+        let match = {}
+        let sortObj = {}
+
+        if (badge) {
+            match.badge = badge
+        }
+
+        if (floor) {
+            match.floor = parseInt(floor)
+        }
+
+        if (room) {
+            match.roomsCount = parseInt(room)
+        }
+
+        if (price_max && price_min) {
+            match.$and = [{price: {$gte:+price_min}}, {price:{$lte:+price_max}}]
+        } else if (price_min) {
+            match.price = {$gte:+price_min}
+        }else if (price_max) {
+            match.price = {$lte:+price_max}
+        }
+
+        if (area_max && area_min) {
+            match.$and = [{area: {$gte:+area_min}}, {area:{$lte:+area_max}}]
+        } else if (area_min) {
+            match.area = {$gte:+area_min}
+        }else if (area_max) {
+            match.area = {$lte:+area_max}
+        }
+
+        if (sort) {
+            if (sort === "priceIncrease") {
+                sortObj.price = 1
+            } else if (sort === "priceDecrease") {
+                sortObj.price = -1
+            } else if (sort === "areaIncrease") {
+                sortObj.area = 1
+            } else if (sort === "areaDecrease") {
+                sortObj.area = -1
+            } else if (sort === "roomsCountIncrease") {
+                sortObj.roomsCount = 1
+            } else if (sort === "roomsCountDecrease") {
+                sortObj.roomsCount = -1
+            }
+        } else {
+            sortObj.price = -1
+        }
+
+        const count = await RoomType.aggregate([
+            { $match: match }
+        ])
+        const filter = await RoomType.aggregate([
+            { $match: match },
+            { $sort: sortObj },
+            { $skip: skip },
+            { $limit: Number(limit) }
+        ])
+        return {count: count.length, filter}
     }
 
     async createHouse(body, file) {
